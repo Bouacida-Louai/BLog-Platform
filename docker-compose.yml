@@ -1,0 +1,17 @@
+services:
+  db:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: adminadmin
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: myuserpassword
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - "8888:8080"
