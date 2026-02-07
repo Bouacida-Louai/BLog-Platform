@@ -23,7 +23,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 @RequiredArgsConstructor
 public class securityConfig {
 
-    private  final UserDetailsService userDetailsService;
 
 
     @Bean
@@ -44,15 +43,6 @@ public class securityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder builder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
 
-        builder.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
-
-        return builder.build();
-    }
 
 }
