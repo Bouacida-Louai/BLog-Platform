@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,10 +25,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+    @Value("${security.jwt.secret}")
+    private String secret;
 
-    private Long jwtExpiryMs=8640000L;
+    @Value("${security.jwt.expiration-ms}")
+    private long jwtExpiryMs;
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+
+
     @Override
     public UserDetails authenticate(String email, String password) {
         authenticationManager.authenticate(
@@ -65,8 +74,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return claims.getSubject();
     }
 
-    private Key getSigningKey() {
-        byte[] keyBytes = secretKey.getBytes();
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+
 }
