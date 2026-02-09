@@ -1,10 +1,11 @@
-package org.sid.blogapp.services;
+package org.sid.blogapp.services.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.sid.blogapp.services.AuthenticationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,57 +22,52 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private final UserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
-    @Value("${security.jwt.secret}")
-    private String secret;
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    @Value("${security.jwt.expiration-ms}")
-    private long jwtExpiryMs;
-
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-    }
-
-
+    private final Long jwtExpiryMs = 86400000L;
 
     @Override
     public UserDetails authenticate(String email, String password) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
-            return  userDetailsService.loadUserByUsername(email);
+        return userDetailsService.loadUserByUsername(email);
     }
-
 
     @Override
     public String generateToken(UserDetails userDetails) {
-        Map<String,Object> claims = new HashMap<>();
-       return Jwts.builder()
+        Map<String, Object> claims = new HashMap<>();
+        return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiryMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
-
     }
 
     @Override
     public UserDetails validateToken(String token) {
-         String username=extractUsername(token);
+        String username = extractUsername(token);
         return userDetailsService.loadUserByUsername(username);
     }
 
-    String extractUsername(String token) {
-         Claims claims =Jwts.parserBuilder()
+    private String extractUsername(String token) {
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-            return claims.getSubject();
+        return claims.getSubject();
     }
 
+    private Key getSigningKey() {
+        byte[] keyBytes = secretKey.getBytes();
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
 }

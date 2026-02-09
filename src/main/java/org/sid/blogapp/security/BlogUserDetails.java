@@ -2,14 +2,12 @@ package org.sid.blogapp.security;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.sid.blogapp.domain.entities.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +23,7 @@ public class BlogUserDetails implements UserDetails {
     }
 
     @Override
-    public @Nullable String getPassword() {
+    public String getPassword() {
         return user.getPassword();
     }
 
@@ -54,7 +52,7 @@ public class BlogUserDetails implements UserDetails {
         return true;
     }
 
-    public UUID getId(){
+    public UUID getId() {
         return user.getId();
     }
 }

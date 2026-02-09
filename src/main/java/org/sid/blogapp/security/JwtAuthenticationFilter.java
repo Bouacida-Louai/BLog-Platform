@@ -13,9 +13,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-@Slf4j
+
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final AuthenticationService authenticationService;
 
     @Override
@@ -25,31 +27,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = extractToken(request);
             if (token != null) {
-                UserDetails userDetails= authenticationService.validateToken(token);
-                UsernamePasswordAuthenticationToken authentication=
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UserDetails userDetails = authenticationService.validateToken(token);
+
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                if (userDetails  instanceof BlogUserDetails ){
-                    request.setAttribute("userId", ((BlogUserDetails) userDetails).getUser().getId());
+                if (userDetails instanceof BlogUserDetails) {
+                    request.setAttribute("userId", ((BlogUserDetails) userDetails).getId());
                 }
             }
-        }catch (Exception e){
-            // Log the exception or handle it as needed
-            log.warn("received invalid token: {}", e.getMessage());
+        } catch(Exception ex) {
+            // Do not throw exceptions, just don't authenticate the user
+            log.warn("Received invalid auth token");
         }
-        filterChain.doFilter(request,response);
 
-
-
+        filterChain.doFilter(request, response);
     }
 
     private String extractToken(HttpServletRequest request) {
-       String baererToken= request.getHeader("Authorization");
-       if (baererToken != null && baererToken.startsWith("Bearer ")) {
-              return baererToken.substring(7);
-       }
-         return null;
+        String bearerToken = request.getHeader("Authorization");
+        if(bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 }
