@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST,"/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/v1/posts/drafts").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/posts/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/tags").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/tags/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()

@@ -1,14 +1,18 @@
 package org.sid.blogapp.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.sid.blogapp.domain.CreatePostRequest;
+import org.sid.blogapp.domain.UpdatePostRequest;
 import org.sid.blogapp.domain.dtos.CreatePostRequestDto;
 import org.sid.blogapp.domain.dtos.PostDto;
+import org.sid.blogapp.domain.dtos.UpdatePostRequestDto;
 import org.sid.blogapp.domain.entities.Post;
 import org.sid.blogapp.domain.entities.User;
 import org.sid.blogapp.mappers.PostMapper;
 import org.sid.blogapp.services.PostService;
 import org.sid.blogapp.services.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +50,7 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody CreatePostRequestDto createPostRequestDto,
+    public ResponseEntity<PostDto> createPost(@Valid @RequestBody CreatePostRequestDto createPostRequestDto,
                                               @RequestAttribute UUID userId) {
         User  logedInUser =userService.getUserById(userId);
         CreatePostRequest createPostRequest= postMapper.toCreatePostRequest(createPostRequestDto);
@@ -55,6 +59,25 @@ public class PostController {
 
       PostDto postDto = postMapper.toDto(createdPost);
         return new ResponseEntity<>(postDto,HttpStatus.CREATED);
+    }
+
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<PostDto> updatePost(
+            @PathVariable UUID id,
+            @Valid  @RequestBody UpdatePostRequestDto updatePostRequestDto){
+        UpdatePostRequest updatePostRequest = postMapper.toUpdatePostRequest(updatePostRequestDto);
+       Post post= postService.updatePost(id, updatePostRequest);
+        PostDto postDto = postMapper.toDto(post);
+        return ResponseEntity.ok(postDto);
+    }
+
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<PostDto> getPost(@PathVariable UUID id){
+        Post post = postService.getPosts(id);
+        PostDto postDto = postMapper.toDto(post);
+        return ResponseEntity.ok(postDto);
+
     }
 
 }
