@@ -3,6 +3,8 @@ package org.sid.blogapp.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import org.sid.blogapp.domain.CreatePostRequest;
+import org.sid.blogapp.domain.dtos.CreatePostRequestDto;
 import org.sid.blogapp.domain.dtos.PostDto;
 import org.sid.blogapp.domain.entities.Post;
 
@@ -12,4 +14,7 @@ public interface PostMapper {
     @Mapping(target = "category", source = "category")
     @Mapping(target = "tags", source = "tags")
     PostDto toDto(Post post);
+
+    CreatePostRequest toCreatePostRequest(CreatePostRequestDto createPostRequestDto);
+
 }
