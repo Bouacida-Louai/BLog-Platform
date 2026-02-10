@@ -1,6 +1,7 @@
 package org.sid.blogapp.services.impl;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.sid.blogapp.domain.entities.Category;
 import org.sid.blogapp.repositories.CategoryRepository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -40,6 +42,14 @@ public class CategoryServiceImpl implements CategoryService {
             throw new IllegalArgumentException("Category with id '"+id+"' does not exist");
         }
         categoryRepository.deleteById(id);
+    }
+
+    @Override
+    public Category getCategoryById(UUID id) {
+        Category category = categoryRepository.findById(id).orElseThrow(
+                ()->new EntityNotFoundException("Category with id '"+id+"' does not exist")
+        );
+        return category;
     }
 
 

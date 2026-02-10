@@ -1,6 +1,7 @@
 package org.sid.blogapp.services.impl;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.sid.blogapp.domain.entities.Tag;
 import org.sid.blogapp.repositories.TagRepository;
@@ -58,6 +59,15 @@ public class TagServiceImpl implements TagService {
             }
             tagRepository.deleteById(id);
         });
+
+    }
+
+    @Override
+    public Tag getTagById(UUID id) {
+        Tag tag = tagRepository.findById(id).orElseThrow(
+                ()->new EntityNotFoundException("Tag with id '"+id+"' does not exist")
+        );
+        return tag;
 
     }
 
